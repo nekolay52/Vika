@@ -30,55 +30,53 @@ response.raise_for_status()
 
 soup = BeautifulSoup(response.text, features="html.parser")
 some_headline = soup.find('h1', class_="firstHeading mw-first-heading")
-ocnovnoy = soup.find('div', class_="mw-content-ltr mw-parser-output")
-tosh_divan = ocnovnoy.find_all(['p', "h1", "h2", "h3", "h4", "h5", "h6", "img"])
-tosh_divan = [some_headline] + tosh_divan
+news_block = soup.find('div', class_="mw-content-ltr mw-parser-output")
+tags = news_block.find_all(['p', "h1", "h2", "h3", "h4", "h5", "h6", "img"])
+tags = [some_headline] + tags
 
-#удоление пустЮ разд-ов
 
-for i in range(len(tosh_divan) - 1, -1, -1):
-    if "<p" in str(tosh_divan[i]):
+for i in range(len(tags) - 1, -1, -1):
+    if "<p" in str(tags[i]):
         w = i
         break
 
-qyqy = tosh_divan[:w + 1]
+tags = tags[:w + 1]
 
 doc = Document()
 
 doc = dngffdfkg(doc)
 
 
-for teg in qyqy:
-    if "<p>" in str(teg):
-        w = re.sub(r'\[.*?\]', '', teg.text)
-        s = doc.add_paragraph(w)
-        s.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    if "<h1" in str(teg):
-        head = doc.add_heading(teg.text, level=1)
+for tag in tags:
+    if "<p>" in str(tag):
+        paragraph = doc.add_paragraph(re.sub(r'\[.*?\]', '', tag.text))
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    if "<h1" in str(tag):
+        head = doc.add_heading(tag.text, level=1)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if "<h2" in str(teg):
-        head = doc.add_heading(teg.text, level=2)
+    if "<h2" in str(tag):
+        head = doc.add_heading(tag.text, level=2)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if "<h3" in str(teg):
-        head = doc.add_heading(teg.text, level=3)
+    if "<h3" in str(tag):
+        head = doc.add_heading(tag.text, level=3)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if "<h4" in str(teg):
-        head = doc.add_heading(teg.text, level=4)
+    if "<h4" in str(tag):
+        head = doc.add_heading(tag.text, level=4)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if "<h5" in str(teg):
-        head = doc.add_heading(teg.text, level=5)
+    if "<h5" in str(tag):
+        head = doc.add_heading(tag.text, level=5)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if "<h6" in str(teg):
-        head = doc.add_heading(teg.text, level=6)
+    if "<h6" in str(tag):
+        head = doc.add_heading(tag.text, level=6)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    if "<img" in str(teg):
-        response = requests.get("https:" + teg['src'], headers=headers)
+    if "<img" in str(tag):
+        response = requests.get("https:" + tag['src'], headers=headers)
         response.raise_for_status()
         with open('filename.png', "wb") as f:
             f.write(response.content)
-        imga = doc.add_picture('filename.png')
-        imga2 = doc.paragraphs[-1]
-        imga2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_picture('filename.png')
+        imag = doc.paragraphs[-1]
+        imag.alignment = WD_ALIGN_PARAGRAPH.CENTER
 doc.save('test.docx')
 
 
