@@ -2,6 +2,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx import Document
 from docx.shared import Pt
 from bs4 import BeautifulSoup
+from docx.shared import Mm
 import requests
 import re
 
@@ -12,9 +13,19 @@ def dngffdfkg(doc):
     style.font.size = Pt(14)
     return doc
 
-url = "https://ru.wikipedia.org/wiki/Rust_(игра)"
+while True:
+    url = input("введите ссылку на статью Википедии: ")
 
-response = requests.get(url)
+    if "https://ru.wikipedia.org" not in url:
+        print("ну мы тебя же просили типа ввести статью на Википедию что ты делаешь")
+    else:
+        break
+
+headers = {
+    "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 YaBrowser/20.9.3.136 Yowser/2.5 Safari/537.36"
+}
+
+response = requests.get(url, headers=headers)
 response.raise_for_status()
 
 soup = BeautifulSoup(response.text, features="html.parser")
@@ -26,7 +37,7 @@ tosh_divan = [some_headline] + tosh_divan
 #удоление пустЮ разд-ов
 
 for i in range(len(tosh_divan) - 1, -1, -1):
-    if "<h" not in str(tosh_divan[i]):
+    if "<p" in str(tosh_divan[i]):
         w = i
         break
 
@@ -61,7 +72,13 @@ for teg in qyqy:
         head = doc.add_heading(teg.text, level=6)
         head.alignment = WD_ALIGN_PARAGRAPH.CENTER
     if "<img" in str(teg):
-       print("<img")
-
+        response = requests.get("https:" + teg['src'], headers=headers)
+        response.raise_for_status()
+        with open('filename.png', "wb") as f:
+            f.write(response.content)
+        imga = doc.add_picture('filename.png')
+        imga2 = doc.paragraphs[-1]
+        imga2.alignment = WD_ALIGN_PARAGRAPH.CENTER
 doc.save('test.docx')
+
 
