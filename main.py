@@ -75,8 +75,8 @@ for tag in tags:
         with open('filename.png', "wb") as f:
             f.write(response.content)
         doc.add_picture('filename.png')
-        imag = doc.paragraphs[-1]
-        imag.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        image = doc.paragraphs[-1]
+        image.alignment = WD_ALIGN_PARAGRAPH.CENTER
 doc.save('test.docx')
 
 
